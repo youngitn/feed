@@ -27,7 +27,7 @@ Widget PackingLineWorkStation(WorkStationInfo ws) {
               child: Column(
                 children: [
                   Text(
-                    '${ws.type == null ? '' : ws.type}',
+                    '${ws.type ?? ''}',
                     style: TextStyle(
                         fontSize: Get.context!.isLandscape ? 15 : 14,
                         color: Colors.black),
@@ -35,6 +35,7 @@ Widget PackingLineWorkStation(WorkStationInfo ws) {
                 ],
               ),
             )
+
           ///A&C line note box
           : ws.id!.startsWith('C') || ws.id!.startsWith('A')
               ? Container(
@@ -48,7 +49,7 @@ Widget PackingLineWorkStation(WorkStationInfo ws) {
                   child: Column(
                     children: [
                       Text(
-                        '${ws.note == null ? '' : ws.note}',
+                        '${ws.note ?? ''}',
                         style: TextStyle(
                             fontSize: Get.context!.isLandscape ? 15 : 14,
                             color: Colors.black),
@@ -120,7 +121,7 @@ Widget PackingLineWorkStation(WorkStationInfo ws) {
               child: Column(
                 children: [
                   Text(
-                    '${ws.type == null ? '' : ws.type}',
+                    '${ws.type ?? ''}',
                     style: TextStyle(
                         fontSize: Get.context!.isLandscape ? 15 : 15,
                         color: Colors.black),
@@ -140,7 +141,7 @@ Widget PackingLineWorkStation(WorkStationInfo ws) {
                   child: Column(
                     children: [
                       Text(
-                  '${ws.note == null ? '' : ws.note}',
+                        '${ws.note ?? ''}',
                         style: TextStyle(
                             fontSize: Get.context!.isLandscape ? 15 : 14,
                             color: Colors.black),

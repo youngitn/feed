@@ -56,7 +56,7 @@ class WprkStationRepo {
       ]
       """;
 
-  Future<List<WorkStationInfo>?> getAll() async {
+  Future<List<WorkStationInfo>> getAll() async {
     // TODO: implement getNewsHeadline
 
     try {
@@ -87,7 +87,7 @@ class WprkStationRepo {
     } on Exception catch (e) {
       Logger.error(e);
       print(e);
-      return null;
+      return [];
     }
   }
 }

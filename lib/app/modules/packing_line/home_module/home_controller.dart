@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:animator/animator.dart';
+
 import 'package:feed/app/data/repository/work_station_repo.dart';
-import 'package:feed/app/modules/mqtt/mqtt_service.dart';
+
 import 'package:feed/app/widgets/packing_line_layout/color_animate_container.dart';
 import 'package:feed/app/widgets/packing_line_layout/packing_line_road.dart';
 import 'package:feed/app/widgets/packing_line_layout/packing_line_work_station.dart';
@@ -12,7 +12,7 @@ import 'package:feed/app/data/model/work_station_info.dart';
 import 'package:get/get.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../../../main.dart';
+
 
 /**
  * GetX Template Generator - fb.com/htngu.99
@@ -28,12 +28,12 @@ class HomeController extends GetxController {
   var period = const Duration(seconds: 10);
   Timer? timer;
 
-  Future<void> buildLayout(List<WorkStationInfo>? list) async {
+  Future<void> buildLayout(List<WorkStationInfo> list) async {
     List<Widget> al = [];
     List<Widget> bl = [];
     List<Widget> cl = [];
     List<Widget> dl = [];
-    list!.forEach((e) {
+    list.forEach((e) {
       String type = e.id!.substring(0, 1);
 
       switch (type) {
@@ -95,10 +95,10 @@ class HomeController extends GetxController {
     timer!.cancel();
   }
 
-  Color getColorByStatus(Status? status, String type) {
+  Color getColorByStatus(Status status, String type) {
     switch (type) {
       case 'type1':
-        switch (status!.yellowBox) {
+        switch (status.yellowBox) {
           case 'A':
             return Colors.red;
           case 'B':
@@ -109,7 +109,7 @@ class HomeController extends GetxController {
             return Colors.black26;
         }
       case 'type2':
-        switch (status!.blueBox) {
+        switch (status.blueBox) {
           case 'A':
             return Colors.red;
           case 'B':

@@ -12,8 +12,8 @@ import 'package:mqtt5_client/mqtt5_server_client.dart';
 class MqttService extends GetxService {
   /// Edit as needed.
 
-HomeController homeController = Get.put(HomeController());
-  WprkStationRepo? repo;
+  HomeController homeController = Get.put(HomeController());
+  WprkStationRepo repo = WprkStationRepo();
   String hostName = 'broker.emqx.io';
   MqttServerClient? client;
   String pubTopic = 'test/lolx';
@@ -131,9 +131,8 @@ HomeController homeController = Get.put(HomeController());
       homeController.notify(pt);
       final builder2 = MqttPayloadBuilder();
       builder2.addString('Hello from fromflutter! here get tour msg');
-      repo = WprkStationRepo();
-      //123d
-      repo!.json = """
+
+      repo.json = """
       [ 
       {"id":"A01","status":{"yellowBox":"0","blueBox":"1"}},
       {"id":"A02","status":{"yellowBox":"3","blueBox":"1"}},
@@ -179,7 +178,7 @@ HomeController homeController = Get.put(HomeController());
       
       ]
       """;
-      List<WorkStationInfo>? list =  await repo!.getAll();
+      List<WorkStationInfo>? list =  await repo.getAll();
       homeController.buildLayout(list);
 
 

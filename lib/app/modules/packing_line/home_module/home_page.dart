@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
-  HomeController homeController = Get.put(HomeController());
+  HomeController homeController = Get.find();
 
   // @override
   // void initState() {
