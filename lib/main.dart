@@ -108,10 +108,13 @@ class MyApp extends StatelessWidget {
     ///HomeController為首頁,使用會binding來不及綁
     //Get.put<HomeController>(HomeController());
     return GetMaterialApp(
-        initialRoute: '/',
-        getPages: AppPages.pages,
-        home: HomePage(),
-        title: '包裝線待補料狀態',
-        theme: appThemeData);
+      debugShowMaterialGrid: false,
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      getPages: AppPages.pages,
+      home: HomePage(),
+      title: '包裝線待補料狀態',
+      theme: appThemeData,
+    );
   }
 }

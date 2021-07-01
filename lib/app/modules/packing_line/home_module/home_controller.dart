@@ -25,8 +25,25 @@ class HomeController extends GetxController {
   RxList<Widget> w2 = <Widget>[].obs;
   RxList<Widget> c3 = <Widget>[].obs;
   RxList<Widget> c4 = <Widget>[].obs;
+
+  RxString aliveOrDead = ''.obs;
+
   var period = const Duration(seconds: 10);
   Timer? timer;
+
+
+  Color isMqttStillAlive(){
+    Color color = Colors.grey;
+    switch(aliveOrDead.value){
+      case 'alive':
+        color = (Colors.green);
+        break;
+      case 'dead':
+        color = (Colors.red);
+        break;
+    }
+    return color;
+  }
 
   Future<void> buildLayout(List<WorkStationInfo> list) async {
     List<Widget> al = [];
@@ -143,7 +160,7 @@ class HomeController extends GetxController {
     List<WorkStationInfo> list =
         await WprkStationRepo().getAll() as List<WorkStationInfo>;
     buildLayout(list);
-    startUpdateWorkStationStatusCycleOperation();
+    //startUpdateWorkStationStatusCycleOperation();
   }
 
   Widget getBlueBoxColor(String? blueBox, Color? blueBoxColor) {

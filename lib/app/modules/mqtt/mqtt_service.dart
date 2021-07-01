@@ -6,6 +6,7 @@ import 'package:feed/app/data/repository/work_station_repo.dart';
 import 'package:feed/app/modules/packing_line/home_module/home_controller.dart';
 
 import 'package:get/get.dart';
+import 'package:let_log/let_log.dart';
 import 'package:mqtt5_client/mqtt5_client.dart';
 import 'package:mqtt5_client/mqtt5_server_client.dart';
 
@@ -14,7 +15,7 @@ class MqttService extends GetxService {
 
   HomeController homeController = Get.put(HomeController());
   WprkStationRepo repo = WprkStationRepo();
-  String hostName = 'broker.emqx.io';
+  String hostName = '10.60.1.210';
   MqttServerClient? client;
   String pubTopic = 'test/lolx';
   bool topicNotified = false;
@@ -23,19 +24,20 @@ class MqttService extends GetxService {
   Future<MqttService> init() async {
 
     print('MqttController go');
-    client = MqttServerClient(hostName, '');
+    client = MqttServerClient(hostName, 'ytc-pad');
 
     builder = MqttPayloadBuilder();
 
-    client!.logging(on: false);
+    client!.logging(on: true);
 
     /// If you intend to use a keep alive value in your connect message that is not the default(60s)
     /// you must set it here
     client!.keepAlivePeriod = 60;
-
+    client!.autoReconnect = true;
     /// Add the unsolicited disconnection callback
     client!.onDisconnected = onDisconnected;
-
+    client!.onAutoReconnect = onAutoReconnect;
+    client!.onAutoReconnected = onAutoReconnected;
     /// Add the successful connection callback
     client!.onConnected = onConnected;
 
@@ -60,7 +62,7 @@ class MqttService extends GetxService {
     property.pairName = '範例名';
     property.pairValue = '範例值';
     final connMess = MqttConnectMessage()
-        .withClientIdentifier('mqttx_a656fa9b')
+        .withClientIdentifier('ytc-pad')
         .startClean()
         .withUserProperties([property]);
     print('EXAMPLE::Mqtt5 client connecting....');
@@ -70,15 +72,17 @@ class MqttService extends GetxService {
     /// its possible that in some circumstances the broker will just disconnect us, see the spec about this,
     /// we however will never send malformed messages.
     try {
-      await client!.connect();
+      await client!.connect('pad', 'pad');
     } on MqttNoConnectionException catch (e) {
       // Raised by the client when connection fails.
       print('EXAMPLE::client exception - $e');
       client!.disconnect();
+      homeController.aliveOrDead.value = 'dead';
     } on SocketException catch (e) {
       // Raised by the socket layer
       print('EXAMPLE::socket exception - $e');
       client!.disconnect();
+      homeController.aliveOrDead.value = 'dead';
     }
 
     /// Check we are connected. connectionStatus always gives us this and other information.
@@ -95,17 +99,19 @@ class MqttService extends GetxService {
         print(
             'EXAMPLE::Connected - user property value - ${client!.connectionStatus!.connectAckMessage.userProperty![0].pairValue}');
       }
+      homeController.aliveOrDead.value = 'alive';
     } else {
       print(
           'EXAMPLE::ERROR Mqtt5 client connection failed - status is ${client!.connectionStatus}');
       client!.disconnect();
+      homeController.aliveOrDead.value = 'dead';
       //exit(-1);
     }
 
     /// Ok, lets try a subscription
     print('EXAMPLE::Subscribing to the test/lolx topic');
     const topic = 'test/lolx'; // Not a wildcard topic
-    client!.subscribe(topic, MqttQos.atMostOnce);
+    client!.subscribe(topic, MqttQos.atLeastOnce);
     client!.subscribeWithSubscription(MqttSubscription(MqttSubscriptionTopic('text/mqtt')));
     final builder1 = MqttPayloadBuilder();
     builder1.addString(
@@ -241,6 +247,7 @@ class MqttService extends GetxService {
   /// The unsolicited disconnect callback
   void onDisconnected() {
     print('EXAMPLE::OnDisconnected client callback - Client disconnection');
+    homeController.aliveOrDead.value = 'dead';
     if (client!.connectionStatus!.disconnectionOrigin ==
         MqttDisconnectionOrigin.solicited) {
       if (topicNotified) {
@@ -252,21 +259,39 @@ class MqttService extends GetxService {
       } else {
         print(
             'EXAMPLE::OnDisconnected callback is solicited, topic has NOT been notified - this is an ERROR');
+        homeController.aliveOrDead.value = 'dead';
       }
     }
 
     ///斷線後繼續訂閱
-    this.init();
+    //this.init();
     //exit(0);
   }
 
   /// The successful connect callback
   void onConnected() {
     print('EXAMPLE::連接成功');
+    homeController.aliveOrDead.value = 'alive';
   }
 
   /// Pong callback
   void pong() {
     print('EXAMPLE::Ping response client callback invoked');
+  }
+
+  void closeAppDisconnected  () async {
+    await MqttUtilities.asyncSleep(2);
+    client?.disconnect();
+  }
+
+  void onAutoReconnect(){
+    homeController.aliveOrDead.value = 'dead';
+    Logger.log('MQTT Auto Reconnect...');
+    homeController.aliveOrDead.value = 'dead';
+  }
+
+  void onAutoReconnected(){
+    homeController.aliveOrDead.value = 'alive';
+    Logger.log('MQTT Auto Reconnect success!');
   }
 }

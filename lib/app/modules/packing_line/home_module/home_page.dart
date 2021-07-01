@@ -1,6 +1,8 @@
+import 'package:feed/app/modules/mqtt/mqtt_service.dart';
 import 'package:feed/app/theme/app_colors.dart';
 import 'package:feed/app/widgets/packing_line_layout/packing_line_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:let_log/let_log.dart';
 
@@ -64,6 +66,28 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       ),
       appBar: AppBar(
         title: Text('包裝線待補料狀態'),
+        actions: [
+          Text('連接狀態:',style:TextStyle(fontSize: 20)),
+          Obx(() => Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: new BoxDecoration(
+                  color: homeController.isMqttStillAlive(),
+                  shape: BoxShape.circle,
+                ),
+              )),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: '離開',
+            onPressed: () {
+              MqttService mt = Get.find();
+              mt.closeAppDisconnected();
+              Future.delayed(const Duration(milliseconds: 3000), () {
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
