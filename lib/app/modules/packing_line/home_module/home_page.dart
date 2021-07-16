@@ -1,4 +1,5 @@
-import 'package:feed/app/modules/mqtt/mqtt_service.dart';
+
+import 'package:feed/app/service/mqtt/mqtt_service.dart';
 import 'package:feed/app/theme/app_colors.dart';
 import 'package:feed/app/widgets/packing_line_layout/packing_line_layout.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text('包裝線待補料狀態'),
         actions: [
-          Text('連接狀態:',style:TextStyle(fontSize: 20)),
+          Text('連接狀態:', style: TextStyle(fontSize: 20)),
           Obx(() => Container(
                 width: circleSize,
                 height: circleSize,
@@ -105,28 +106,15 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                     SizedBox(
                       height: 60,
                     ),
-                    Text('燈號說明=>   '),
                     Container(
                       width: circleSize,
                       height: circleSize,
                       decoration: new BoxDecoration(
                         color: Colors.red,
-                        shape: BoxShape.circle,
+                        //shape: BoxShape.circle,
                       ),
                     ),
-                    Text(' : 急迫'),
-                    SizedBox(
-                      width: 60,
-                    ),
-                    Container(
-                      width: circleSize,
-                      height: circleSize,
-                      decoration: new BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    Text(' : 正常'),
+                    Text(' : 剩一箱'),
                     SizedBox(
                       width: 60,
                     ),
@@ -135,10 +123,23 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                       height: circleSize,
                       decoration: new BoxDecoration(
                         color: Colors.orange,
-                        shape: BoxShape.circle,
+
+                        //shape: BoxShape.circle,
                       ),
                     ),
-                    Text(' : 預警'),
+                    Text(' : 剩兩箱'),
+                    SizedBox(
+                      width: 60,
+                    ),
+                    Container(
+                      width: circleSize,
+                      height: circleSize,
+                      decoration: new BoxDecoration(
+                        color: Colors.green,
+                        //shape: BoxShape.circle,
+                      ),
+                    ),
+                    Text(' : 剩三箱'),
                     SizedBox(
                       width: 60,
                     ),

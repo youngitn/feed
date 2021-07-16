@@ -45,12 +45,18 @@ class ColorAnimateContainer extends GetWidget<HomeController>{
         return Container(
           width: width,
           height: height,
-          color: color,
+
           alignment: alignment,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueAccent),
+            color: color,
+          ),
           //child: const FlutterLogo(size: 75),
         );
       },
     );
   }
+
+
 
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:feed/app/data/repository/work_station_repo.dart';
 
@@ -10,9 +11,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:feed/app/data/model/work_station_info.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
 import 'package:workmanager/workmanager.dart';
-
-
 
 /**
  * GetX Template Generator - fb.com/htngu.99
@@ -25,32 +26,35 @@ class HomeController extends GetxController {
   RxList<Widget> w2 = <Widget>[].obs;
   RxList<Widget> c3 = <Widget>[].obs;
   RxList<Widget> c4 = <Widget>[].obs;
-
+  WorkStationRepo repo = WorkStationRepo();
   RxString aliveOrDead = ''.obs;
 
   var period = const Duration(seconds: 10);
   Timer? timer;
 
-
-  Color isMqttStillAlive(){
+  Color isMqttStillAlive() {
     Color color = Colors.grey;
-    switch(aliveOrDead.value){
+    switch (aliveOrDead.value) {
       case 'alive':
         color = (Colors.green);
         break;
       case 'dead':
         color = (Colors.red);
         break;
+      case 'working':
+        color = (Colors.indigo);
+        break;
     }
     return color;
   }
 
-  Future<void> buildLayout(List<WorkStationInfo> list) async {
+  Future<void> buildLayout(List<WorkStationInfo>? list) async {
     List<Widget> al = [];
     List<Widget> bl = [];
     List<Widget> cl = [];
     List<Widget> dl = [];
-    list.forEach((e) {
+
+    list!.forEach((e) {
       String type = e.id!.substring(0, 1);
 
       switch (type) {
@@ -85,6 +89,53 @@ class HomeController extends GetxController {
     c4.assignAll(dl);
   }
 
+  Future<List<WorkStationInfo>> buildLayoutx() async {
+    List<Widget> al = [];
+    List<Widget> bl = [];
+    List<Widget> cl = [];
+    List<Widget> dl = [];
+
+    List<WorkStationInfo> ret = await repo.getAll().then((value) {
+      //print(value.length.toString());
+      value.forEach((e) {
+        String type = e.id!.substring(0, 1);
+
+        switch (type) {
+          case 'A':
+            al.add(PackingLineWorkStation(e));
+            break;
+          case 'B':
+            bl.add(PackingLineWorkStation(e));
+            break;
+          case 'C':
+            cl.add(PackingLineWorkStation(e));
+            break;
+          case 'D':
+            dl.add(PackingLineWorkStation(e));
+            break;
+        }
+      });
+      bl.insert(3, PackingLineRoad(''));
+      cl.insert(3, PackingLineRoad(''));
+      bl.insert(8, PackingLineRoad(''));
+      cl.insert(8, PackingLineRoad(''));
+      bl.insert(10, PackingLineRoad(''));
+      cl.insert(10, PackingLineRoad(''));
+      bl.insert(11, PackingLineRoad(''));
+      cl.insert(11, PackingLineRoad(''));
+
+      c1.assignAll(al);
+      w1.assignAll(buildWorkStation(12, 'ROAD'));
+      c2.assignAll(bl);
+      c3.assignAll(cl);
+      w2.assignAll(buildWorkStation(12, 'ROAD'));
+      c4.assignAll(dl);
+      return value;
+    });
+
+    return ret;
+  }
+
   List<Widget> buildWorkStation(int count, String lineCode) {
     List<Widget> l = [];
     for (int i = 1; i <= 12; i++) {
@@ -103,7 +154,7 @@ class HomeController extends GetxController {
     timer = Timer.periodic(period, (timer) async {
       // TODO
       List<WorkStationInfo> list =
-          await WprkStationRepo().getAll() as List<WorkStationInfo>;
+          await WorkStationRepo().getAll() as List<WorkStationInfo>;
       buildLayout(list);
     });
   }
@@ -151,16 +202,35 @@ class HomeController extends GetxController {
       //initialDelay: Duration(seconds: 10),
       inputData: m,
     );
-
   }
 
   @override
   void onInit() async {
     super.onInit();
-    List<WorkStationInfo> list =
-        await WprkStationRepo().getAll() as List<WorkStationInfo>;
-    buildLayout(list);
+    final box = GetStorage();
+    List<WorkStationInfo> ret = await buildLayoutx();
+    if (!box.hasData('lastList')) {
+      box.write('lastList', ret);
+    }
+    //需先初始化blueBoxMap各個key 否則無法及即時更新藍箱
+    Map<String, dynamic> map = Map<String, dynamic>();
+    ret.forEach((element) {
+      map[element.id.toString()] = '0';
+    });
+    box.write('blueBoxMap', map);
+    //lastList = list;
+
     //startUpdateWorkStationStatusCycleOperation();
+  }
+
+  Color? getSpcWorlStationColor(String color) {
+    switch (color) {
+      case 'green':
+        return Colors.green[800];
+      case 'blue':
+        return Colors.blue[300];
+    }
+    return Colors.grey;
   }
 
   Widget getBlueBoxColor(String? blueBox, Color? blueBoxColor) {
@@ -177,7 +247,7 @@ class HomeController extends GetxController {
       case '1':
         return ColorAnimateContainer(blueBoxColor);
     }
-    return Text('?');
+    return ColorAnimateContainer(Colors.white);
   }
 
   Widget getYellowBoxColor(String? yellowBox, Color? yellowBoxColor) {

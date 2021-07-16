@@ -1,5 +1,5 @@
 import 'package:feed/app/data/materiel.dart';
-import 'package:feed/app/modules/mqtt/mqtt_service.dart';
+
 import 'package:feed/app/routes/app_pages.dart';
 
 import 'package:feed/app/widgets/feed_item_info_widget/feed_item_info.dart';

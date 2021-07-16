@@ -5,15 +5,17 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'package:workmanager/workmanager.dart';
 
-import 'app/modules/mqtt/mqtt_service.dart';
 import 'app/modules/packing_line/home_module/home_page.dart';
 import 'app/routes/app_pages.dart';
+import 'app/service/mqtt/mqtt_service.dart';
 import 'app/theme/app_theme.dart';
 
-void initServices() async {
+//init要用到的服務
+Future<void> initServices() async {
   print('starting services ...');
 
   /// Here is where you put get_storage, hive, shared_pref initialization.
@@ -26,15 +28,21 @@ void initServices() async {
 
 Future<void> main() async {
   await initServices();
-// needed if you intend to initialize in the `main` function
+  //資料持久化套件
+  await GetStorage.init();
+  // needed if you intend to initialize in the `main` function
   WidgetsFlutterBinding.ensureInitialized();
+
+  //背景執行程序初始化
   Workmanager().initialize(
 
       // The top level function, aka callbackDispatcher
+      //用來mapping執行邏輯的switch
       callbackDispatcher,
 
       // If enabled it will post a notification whenever
       // the task is running. Handy for debugging tasks
+      //true會輸出額為資訊
       isInDebugMode: false);
 // Periodic task registration
   ///註冊一個週期訊息 最快只能每15分鐘執行一次
@@ -56,6 +64,7 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
+//Workmanager的邏輯分配器 根據task mapping執行邏輯
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     print(task);

@@ -13,17 +13,17 @@ class WorkStationInfo with Mappable {
   Status? status;
 
   WorkStationInfo({String? id, Status? status, String? type, String? note}) {
-    id = id;
-    type = type;
-    note = note;
-    status = status;
+    this.id = id;
+    this.type = type;
+    this.note = note;
+    this.status = status;
   }
 
   WorkStationInfo.fromJson(dynamic json) {
-    id = json["id"];
-    status = json["status"];
-    note = json["note"];
-    type = json["type"];
+    this.id = json["id"];
+    this.status = json["status"];
+    this.note = json["note"];
+    this.type = json["type"];
   }
 
   @override
@@ -50,51 +50,62 @@ class Status with Mappable {
   Color? blueBoxColor;
 
   Status({String? yellowBox, String? blueBox}) {
-    yellowBox = yellowBox;
-    blueBox = blueBox;
+    this.yellowBox = yellowBox;
+    this.blueBox = blueBox;
+    this.yellowBoxColor = buildYellowBoxColor();
+    this.blueBoxColor = buildBlueBoxColor();
   }
 
   Status.fromJson(dynamic json) {
-    yellowBox = json["yellowBox"];
-    blueBox = json["blueBox"];
+    this.yellowBox = json["yellowBox"];
+    this.blueBox = json["blueBox"];
   }
 
   Map<String, dynamic> toJson() {
     var map = <String, dynamic>{};
-    map["yellowBox"] = yellowBox;
-    map["blueBox"] = blueBox;
+    map["yellowBox"] = this.yellowBox;
+    map["blueBox"] = this.blueBox;
     return map;
+  }
+
+  Color buildBlueBoxColor() {
+    switch (this.blueBox) {
+      case '0':
+        return Colors.white;
+
+      case '1':
+        return Colors.blue;
+    }
+    return Colors.white;
+  }
+
+  Color buildYellowBoxColor() {
+    switch (this.yellowBox) {
+      case '0':
+        return Colors.white;
+        break;
+      case '1':
+        return Colors.green;
+        break;
+      case '2':
+        return Colors.orange;
+        break;
+      case '3':
+        return Colors.red;
+        break;
+    }
+    return Colors.white;
   }
 
   @override
   void mapping(Mapper map) {
-    map("yellowBox", yellowBox, (v) => yellowBox = v);
-    map("blueBox", blueBox, (v) => blueBox = v);
+    map("yellowBox", yellowBox, (v) =>  this.yellowBox = v);
+    map("blueBox", blueBox, (v) =>  this.blueBox = v);
     map("yellowBoxColor", yellowBoxColor, (v) {
-      switch (yellowBox) {
-        case '0':
-          yellowBoxColor = Colors.white;
-          break;
-        case '1':
-          yellowBoxColor = Colors.green;
-          break;
-        case '2':
-          yellowBoxColor = Colors.orange;
-          break;
-        case '3':
-          yellowBoxColor = Colors.red;
-          break;
-      }
+      this.yellowBoxColor = buildYellowBoxColor();
     });
     map("blueBoxColor", blueBoxColor, (v) {
-      switch (blueBox) {
-        case '0':
-          blueBoxColor = Colors.white;
-          break;
-        case '1':
-          blueBoxColor = Colors.blue;
-          break;
-      }
+      this.blueBoxColor = buildBlueBoxColor();
     });
   }
 }
